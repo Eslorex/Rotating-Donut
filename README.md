@@ -33,18 +33,18 @@ This Python script draws and animates a rotating 3D donut in the console. It use
 4. **Apply Rotation**:
    - The 3D coordinates are rotated around the Y-axis by angle `A`.
    - The new coordinates (`x_prime`, `z_prime`) are computed using rotation formulas:
-     - \( x' = x \cdot \cos(A) + z \cdot \sin(A) \)
-     - \( z' = -x \cdot \sin(A) + z \cdot \cos(A) \)
+     - x_prime = x * cos(A) + z * sin(A)
+     - z_prime = -x * sin(A) + z * cos(A)
 
 5. **Depth Calculation**:
    - The depth value `D` is calculated to create a perspective effect:
-     - \( D = \frac{1}{z' + 5} \)
+     - D = 1 / (z_prime + 5)
    - This ensures that points farther from the viewer appear smaller.
 
 6. **Project 3D to 2D**:
    - The 3D coordinates are projected onto a 2D plane:
-     - \( x_{\text{screen}} = 40 + 30 \cdot D \cdot x' \)
-     - \( y_{\text{screen}} = 12 + 15 \cdot D \cdot y \)
+     - xp = 40 + 30 * D * x_prime
+     - yp = 12 + 15 * D * y
    - The resulting 2D coordinates (`xp`, `yp`) are used to find the position in the console buffer (`o`).
 
 7. **Calculate Luminance**:
@@ -61,4 +61,3 @@ This Python script draws and animates a rotating 3D donut in the console. It use
 
 ### Main Loop
 - The `main()` function runs an infinite loop that repeatedly calls `draw_donut`, increments `A` to animate the rotation, and adds a short delay with `time.sleep(0.03)` to control the animation speed.
-
