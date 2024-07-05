@@ -4,7 +4,7 @@ This Python script draws and animates a rotating 3D donut in the console. It use
 
 ## Explanation
 ### Function to Move Cursor to Top
-- `move_cursor_to_top()`: Moves the cursor to the top of the console using an escape sequence.
+- `move_cursor_to_top()`: Moves the cursor to the top of the console using an escape sequence. This allows the new frame to overwrite the previous one, creating the illusion of animation.
 
 ### Main Drawing Function
 - `draw_donut(A)`: Draws a frame of the rotating donut.
@@ -15,35 +15,50 @@ This Python script draws and animates a rotating 3D donut in the console. It use
 - `b`: Stores characters that will be printed to the console to form the image of the donut.
 - `luminance_chars`: A string of characters used to represent different levels of brightness on the donut's surface.
 
-#### Loop Through Points on the Donut
-- Iterates over angles `i` and `j` to cover the surface of the donut. These angles represent points in the donut's parametric equations.
+### Working Order of `draw_donut`
 
-#### Calculate Coordinates
-- Uses sine and cosine of angles `i`, `j`, and `A` to determine the 3D coordinates of points on the donut and apply the rotation.
+1. **Initialize Buffers**:
+   - `z_buffer` is initialized to store depth information. It is used to determine which parts of the donut are visible.
+   - `b` is initialized to store the characters that will form the donut's image.
+   - `luminance_chars` is a string containing characters that represent different levels of brightness.
 
-#### 3D to 2D Transformation
-- Determines the 3D coordinates (`x`, `y`, `z`) of each point on the donut.
+2. **Iterate Over Angles**:
+   - The outer loop iterates over the angle `j`, which represents the circle around the donut.
+   - The inner loop iterates over the angle `i`, which represents the tube of the donut.
 
-#### Rotate Around the Y-axis
-- Applies rotation around the Y-axis using the angle `A` to calculate new coordinates (`x_prime`, `z_prime`).
+3. **Calculate 3D Coordinates**:
+   - For each combination of `i` and `j`, the script calculates the 3D coordinates (`x`, `y`, `z`) using trigonometric functions.
+   - `i` and `j` are angles in radians, and the calculations use sine and cosine functions to find the coordinates.
 
-#### Depth Calculation
-- Calculates the depth (`D`) to create a perspective effect, making the donut look 3D.
+4. **Apply Rotation**:
+   - The 3D coordinates are rotated around the Y-axis by angle `A`.
+   - The new coordinates (`x_prime`, `z_prime`) are computed using rotation formulas:
+     - \( x' = x \cdot \cos(A) + z \cdot \sin(A) \)
+     - \( z' = -x \cdot \sin(A) + z \cdot \cos(A) \)
 
-#### Project 3D Coordinates to 2D
-- Converts the 3D coordinates to 2D screen coordinates (`xp`, `yp`) and determines the position in the console buffer (`o`).
+5. **Depth Calculation**:
+   - The depth value `D` is calculated to create a perspective effect:
+     - \( D = \frac{1}{z' + 5} \)
+   - This ensures that points farther from the viewer appear smaller.
 
-#### Calculate Luminance
-- Calculates the brightness of each point on the donut using a formula and clamps the result to ensure it is within the valid range of the luminance characters.
+6. **Project 3D to 2D**:
+   - The 3D coordinates are projected onto a 2D plane:
+     - \( x_{\text{screen}} = 40 + 30 \cdot D \cdot x' \)
+     - \( y_{\text{screen}} = 12 + 15 \cdot D \cdot y \)
+   - The resulting 2D coordinates (`xp`, `yp`) are used to find the position in the console buffer (`o`).
 
-#### Update Buffers
-- Updates the `z_buffer` and `b` arrays if the current point is closer than any previously rendered point at the same screen position.
+7. **Calculate Luminance**:
+   - The brightness of each point is calculated using a formula that considers the angles and rotations.
+   - The result is clamped to ensure it is within the valid range of `luminance_chars`.
 
-### Print the Frame
-- Moves the cursor to the top and prints the contents of the `b` array to the console to create the frame of the donut.
+8. **Update Buffers**:
+   - If the current point is closer to the viewer than any previously rendered point at the same screen position, the `z_buffer` and `b` arrays are updated.
+   - This ensures that only the visible parts of the donut are rendered.
+
+9. **Print the Frame**:
+   - The cursor is moved to the top of the console.
+   - The contents of the `b` array are printed to the console, forming the frame of the donut.
 
 ### Main Loop
 - The `main()` function runs an infinite loop that repeatedly calls `draw_donut`, increments `A` to animate the rotation, and adds a short delay with `time.sleep(0.03)` to control the animation speed.
 
-## Summary
-This code draws and animates a rotating 3D donut in the console. It uses trigonometric functions to calculate the 3D coordinates of points on the donut, applies a rotation, and projects these points onto a 2D plane. The brightness of each point is calculated to give a realistic 3D appearance, and the entire frame is printed to the console in each iteration to create the animation effect.
